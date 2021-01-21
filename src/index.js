@@ -12,15 +12,44 @@ export default function App(){
       });
     }, []);
 
-    async function handleAddProject(){
+    async function handleAddProject() {
       const response = await api.post('projects', {
         title: `Novo Projeto ${Date.now()}`,
-        owner: 'Jose Julio'
+        owner: 'José Julio'
       });
 
       const project = response.data;
 
       setProjects([...projects, project]);
+    }
+
+    async function handleUpdateProject(id) {
+
+      const response = await api.put(`projects/${id}`, {
+          title: `Projeto alterado ${Data.now()}`,
+          owner: 'José Julio'
+      });
+
+      const updateProject = response.data;
+
+      const projectsUpdate = projects.map(project => {
+        if(project.id === id) {
+          return updateProject;
+        }else {
+          return project;
+        }
+      });
+
+      setProjects(projectsUpdate);
+
+    }
+
+    async function handleExclusaoProject(id) {
+      await api.delete(`projects/${id}`);
+
+      setProjects(projects.filter(
+        project => project.id !== id
+      ));
     }
     
     return (
@@ -31,7 +60,12 @@ export default function App(){
                data={projects}
                keyExtractor={project => project.id}
                renderItem={({item: project}) => (
-                  <Text style={styles.project} >{project.title}</Text>
+                  <>
+                    <Text style={styles.project} > {project.title} </Text>
+                    <Text style={styles.textButtonUpdateDelte} onPress={() => handleUpdateProject(project.id)}> alterar </Text>
+                    <Text style={styles.textButtonUpdateDelte} onPress={() => handleExclusaoProject(project.id)}> excluir </Text>
+                  </>
+                  
                )}
              />
 
@@ -73,6 +107,10 @@ const styles = StyleSheet.create({
     },
     textButton: {
       fontSize: 16,
+      fontWeight: 'bold'
+    },
+    textButtonUpdateDelte: {
+      fontSize: 20,
       fontWeight: 'bold'
     },
 });
